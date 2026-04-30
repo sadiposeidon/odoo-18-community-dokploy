@@ -47,9 +47,15 @@ RUN git clone https://github.com/odoo/odoo --depth 1 --branch 18.0 /opt/odoo/odo
 WORKDIR /opt/odoo/odoo
 
 # =========================
-# Python dependencies
+# FIX: virtual environment (IMPORTANT)
 # =========================
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# =========================
+# Python dependencies (FIXED)
+# =========================
+RUN pip install --no-cache-dir -r requirements.txt
 
 # =========================
 # Create directories
@@ -58,7 +64,7 @@ RUN mkdir -p /var/lib/odoo /etc/odoo /odoo_models /var/log/odoo \
     && chown -R odoo:odoo /var/lib/odoo /etc/odoo /opt/odoo /odoo_models /var/log/odoo
 
 # =========================
-# COPY CONFIG FROM GITHUB (FIX)
+# COPY CONFIG FROM GITHUB
 # =========================
 COPY odoo.conf /etc/odoo/odoo.conf
 
