@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:17.2
+    restart: always
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: d8qUtaT5G5thesTedlC9
+      POSTGRES_DB: postgres
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+
+  odoo:
+    build: .
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - ./odoo_models:/odoo_models
+      - ./odoo.conf:/etc/odoo/odoo.conf
+
+    labels:
+      - "traefik.enable=true"
+
+      # ERP
+      - "traefik.http.routers.odoo.rule=Host(`erp.coffeezone.az`)"
+      - "traefik.http.routers.odoo.entrypoints=websecure"
+      - "traefik.http.routers.odoo.tls=true"
+      - "traefik.http.services.odoo.loadbalancer.server.port=8069"
+
+      # POS
+      - "traefik.http.routers.odoo-pos.rule=Host(`pos.coffeezone.az`)"
+      - "traefik.http.routers.odoo-pos.entrypoints=websecure"
+      - "traefik.http.routers.odoo-pos.tls=true"
+      - "traefik.http.routers.odoo-pos.middlewares=pos-redirect"
+
+      # redirect
+      - "traefik.http.middlewares.pos-redirect.redirectregex.regex=^https?://pos.coffeezone.az/?$"
+      - "traefik.http.middlewares.pos-redirect.redirectregex.replacement=https://pos.coffeezone.az/pos/web"
+      - "traefik.http.middlewares.pos-redirect.redirectregex.permanent=true"
