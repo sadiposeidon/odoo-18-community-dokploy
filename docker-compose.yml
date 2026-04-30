@@ -7,7 +7,7 @@
       environment:
         POSTGRES_USER: odoo
         POSTGRES_PASSWORD: ac6zUt1jVfppRwvWnK33
-        POSTGRES_DB: postgres
+        POSTGRES_DB: odoo
       volumes:
         - db_data:/var/lib/postgresql/data
       healthcheck:
