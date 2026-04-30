@@ -3,7 +3,7 @@
       image: postgres:17
       restart: always
       ports:
-        - "30003:5432"
+        - "127.0.0.1:30003:5432"
       environment:
         POSTGRES_USER: odoo
         POSTGRES_PASSWORD: ac6zUt1jVfppRwvWnK33
@@ -26,9 +26,6 @@
         HOST: db
         USER: odoo
         PASSWORD: ac6zUt1jVfppRwvWnK33
-      ports:
-        - "20003:8069"
-        - "20004:8072"
       volumes:
         - ./odoo_models:/odoo_models
         - ./odoo.conf:/etc/odoo/odoo.conf

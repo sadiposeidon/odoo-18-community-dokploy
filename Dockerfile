@@ -90,12 +90,6 @@ RUN mkdir -p /var/lib/odoo /etc/odoo /var/log/odoo \
 
 
 # =========================
-# Config (optional COPY OR VOLUME)
-# =========================
-COPY odoo.conf /etc/odoo/odoo.conf
-
-
-# =========================
 # User
 # =========================
 USER odoo
