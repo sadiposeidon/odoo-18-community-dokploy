@@ -2,7 +2,9 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# =========================
 # System dependencies
+# =========================
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -29,24 +31,40 @@ RUN apt-get update && apt-get install -y \
     fonts-courier-prime \
     ttf-mscorefonts-installer \
     python3-ldap \
-    && fc-cache -f -v \
+    fontconfig \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create odoo user
+# =========================
+# Create user
+# =========================
 RUN useradd -m -d /opt/odoo -U -r -s /bin/bash odoo
 
-# Clone Odoo 18 Community
+# =========================
+# Clone Odoo
+# =========================
 RUN git clone https://github.com/odoo/odoo --depth 1 --branch 18.0 /opt/odoo/odoo
 
 WORKDIR /opt/odoo/odoo
 
-# Install Python dependencies
+# =========================
+# Python dependencies
+# =========================
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+# =========================
 # Create directories
-RUN mkdir -p /var/lib/odoo /etc/odoo /odoo_models \
-    && chown -R odoo:odoo /var/lib/odoo /etc/odoo /opt/odoo /odoo_models
+# =========================
+RUN mkdir -p /var/lib/odoo /etc/odoo /odoo_models /var/log/odoo \
+    && chown -R odoo:odoo /var/lib/odoo /etc/odoo /opt/odoo /odoo_models /var/log/odoo
 
+# =========================
+# COPY CONFIG FROM GITHUB (FIX)
+# =========================
+COPY odoo.conf /etc/odoo/odoo.conf
+
+# =========================
+# Switch user
+# =========================
 USER odoo
 
 EXPOSE 8069
