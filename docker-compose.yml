@@ -1,42 +1,49 @@
-services:
-  db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: odoo
-      POSTGRES_PASSWORD: d8qUtaT5G5thesTedlC9
-      POSTGRES_DB: postgres
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U odoo"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  services:
+    db:
+      image: postgres:17
+      restart: always
+      ports:
+        - "30003:5432"
+      environment:
+        POSTGRES_USER: odoo
+        POSTGRES_PASSWORD: ac6zUt1jVfppRwvWnK33
+        POSTGRES_DB: postgres
+      volumes:
+        - db_data:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U odoo"]
+        interval: 5s
+        timeout: 5s
+        retries: 10
 
-  odoo:
-    build: .
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: always
-    environment:
-      HOST: db
-      USER: odoo
-      PASSWORD: d8qUtaT5G5thesTedlC9
-    volumes:
-      - ./odoo_models:/odoo_models
+    odoo:
+      build: .
+      depends_on:
+        db:
+          condition: service_healthy
+      restart: always
+      environment:
+        HOST: db
+        USER: odoo
+        PASSWORD: ac6zUt1jVfppRwvWnK33
+      ports:
+        - "20003:8069"
+        - "20004:8072"
+      volumes:
+        - ./odoo_models:/odoo_models
+        - ./odoo.conf:/etc/odoo/odoo.conf
 
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.odoo.rule=Host(`erp.coffeezone.az`)"
-      - "traefik.http.routers.odoo.entrypoints=websecure"
-      - "traefik.http.routers.odoo.tls=true"
-      - "traefik.http.services.odoo.loadbalancer.server.port=8069"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.odoo.rule=Host(`erp.coffeezone.az`)"
+        - "traefik.http.routers.odoo.entrypoints=websecure"
+        - "traefik.http.routers.odoo.tls=true"
 
-      - "traefik.http.routers.pos.rule=Host(`pos.coffeezone.az`)"
-      - "traefik.http.routers.pos.entrypoints=websecure"
-      - "traefik.http.routers.pos.tls=true"
+        - "traefik.http.routers.pos.rule=Host(`pos.coffeezone.az`)"
+        - "traefik.http.routers.pos.entrypoints=websecure"
+        - "traefik.http.routers.pos.tls=true"
 
-volumes:
-  db_data:
+        - "traefik.http.services.odoo.loadbalancer.server.port=8069"
+
+  volumes:
+    db_data:
